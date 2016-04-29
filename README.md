@@ -1,3 +1,0 @@
-# dungeonAlgorithm
-
-I've always wanted to created dungeons, so here's my attempt at it. For testing purposes for my new game from the 'topDownGame' repo...
