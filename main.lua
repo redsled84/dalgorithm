@@ -199,7 +199,60 @@ function love.load()
 	math.randomseed(os.time())
 	math.random();math.random();math.random();
 
-	Rooms:loadRooms(numOfRooms)
+	-- Rooms:loadRooms(numOfRooms)
+	local tilesize = 64
+	local room1 = {
+		x = 1*tilesize,
+		y = 0,
+		width = tilesize,
+		height = tilesize,
+		color = { 255, 255, 255, 200 },
+		doors = {},
+		id = 1
+	}
+	local room2 = {
+		x = 0,
+		y = 1*tilesize,
+		width = tilesize,
+		height = tilesize,
+		color = { 255, 255, 255, 200 },
+		doors = {},
+		id = 2
+	}
+	local room3 = {
+		x = 1*tilesize,
+		y = 1*tilesize,
+		width = tilesize,
+		height = tilesize,
+		color = { 255, 255, 255, 200 },
+		doors = {},
+		id = 3
+	}
+	local room4 = {
+		x = 1*tilesize,
+		y = 2*tilesize,
+		width = tilesize,
+		height = tilesize,
+		color = { 255, 255, 255, 200 },
+		doors = {},
+		id = 4
+	}
+	local room5 = {
+		x = 2*tilesize,
+		y = 1*tilesize,
+		width = tilesize,
+		height = tilesize,
+		color = { 255, 255, 255, 200 },
+		doors = {},
+		id = 5
+	}	
+	table.insert(Rooms, room5)
+	table.insert(Rooms, room4)
+	table.insert(Rooms, room2)
+	table.insert(Rooms, room1)
+	table.insert(Rooms, room3)
+
+	print(#Rooms)
 
 	Rooms:collisionResolution()
 	Rooms:checkSurroundingRooms()
@@ -222,28 +275,31 @@ function love.update(dt)
 		camY = camY + 100 * dt
 	end
 
+	print(#positions)
+
 	cam:setPosition(camX, camY)
 end
 
 function love.draw()
 	cam:draw(function(l,t,w,h)
 		for _, v in ipairs(Rooms) do
-			v:draw()
+			love.graphics.setColor(unpack(v.color))
+			love.graphics.rectangle('line', v.x, v.y, v.width, v.height)
 			if #v.doors > 0 then
 				love.graphics.setColor(0,255,0, 100)
 				love.graphics.rectangle('fill', v.doors[1].x, v.doors[1].y, v.doors[1].width, v.doors[1].height)
 			end
 		end
 
-		-- for _, v in ipairs(positions) do
-		-- 	if v.x ~= nil then
-		-- 		love.graphics.setColor(255,0,0)
-		-- 		love.graphics.line(v.x, v.y1, v.x, v.y2)
-		-- 	elseif v.y ~= nil then
-		-- 		love.graphics.setColor(255,0,0)
-		-- 		love.graphics.line(v.x1, v.y, v.x2, v.y)
-		-- 	end
-		-- end
+		for _, v in ipairs(positions) do
+			if v.x ~= nil then
+				love.graphics.setColor(255,0,0)
+				love.graphics.line(v.x, v.y1, v.x, v.y2)
+			elseif v.y ~= nil then
+				love.graphics.setColor(255,0,0)
+				love.graphics.line(v.x1, v.y, v.x2, v.y)
+			end
+		end
 	end)
 end
 
