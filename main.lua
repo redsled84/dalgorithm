@@ -25,22 +25,27 @@ function Room:chooseSide(roomA, roomB, side)
 	end
 end
 
-function Room:spawnRooms()
-	local side = math.random(1,4)	
-	if #self.rooms < 1 then
-		local roomB = {w = math.random(2,7)*tileSize, h = math.random(2, 7)*tileSize}
-		local x, y = self:chooseSide(self.base, roomB, side)
-		roomB.x, roomB.y = x, y
-		table.insert(self.rooms, roomB)
-	else
-
+function Room:spawnRooms(n)
+	local side = math.random(1,4)
+	local roomB = {w = math.random(2,7)*tileSize, h = math.random(2, 7)*tileSize}
+	local r, g, b = math.random(30,255), math.random(30,255), math.random(30,255)
+	roomB.colors = {r, g, b, 100}
+	local x, y = self:chooseSide(self.base, roomB, side)
+	roomB.x, roomB.y = x, y
+	table.insert(self.rooms, roomB)
+	if #self.rooms <= n then
+		local index = #self.rooms
+		self.base = self.rooms[index]
+		self:spawnRooms(n)
 	end
 end
 
 function Room:draw()
+	love.graphics.setColor(255,255,255)
 	love.graphics.rectangle('fill', self.base.x, self.base.y, self.base.w, self.base.h)
 	for i, v in ipairs(self.rooms) do
-		love.graphics.rectangle('line', v.x, v.y, v.w, v.h)
+		love.graphics.setColor(unpack(v.colors))
+		love.graphics.rectangle('fill', v.x, v.y, v.w, v.h)
 	end
 end
 
@@ -53,11 +58,11 @@ end
 
 function love.load()
 	Room:initializeRootRoom()
-	Room:spawnRooms()
+	Room:spawnRooms(5)
 end
 
 function love.update(dt)
-
+	print(#Room.rooms)
 end
 
 function love.draw()
