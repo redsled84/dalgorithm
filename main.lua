@@ -1,79 +1,37 @@
-math.randomseed(os.time())
-math.random(); math.random(); math.random();
+require 'yaci'
 
-local tileSize = 32
-local Room = {rooms={}}
-
-function Room:initializeRootRoom()
-	local screenTileX = math.floor(love.graphics.getWidth() / tileSize)
-	local screenTileY = math.floor(love.graphics.getHeight() / tileSize)
-	local tilesWide = math.random(2, 7)
-	local tilesHigh = math.random(2, 7)
-	local x, y = math.random(0, screenTileX-tilesWide), math.random(0, screenTileY-tilesHigh)
-	self.base = {x = x*tileSize, y = y*tileSize, w = tilesWide*tileSize, h = tilesHigh*tileSize}
+local Node = newclass('Node')
+function Node:new(x, y, w, h)
+	local node = {x=x, y=y, w=w, h=h}
+	table.insert(self.nodes, node)
+	return node
 end
 
-function Room:chooseSide(roomA, roomB, side)
-	if side == 2 then
-		return roomA.x+roomA.w, roomA.y
-	elseif side == 4 then
-		return roomA.x-roomB.w, roomA.y
-	elseif side == 1 then
-		return roomA.x, roomA.y-roomB.h
-	elseif side == 3 then
-		return roomA.x, roomA.y+roomA.h
+function Node:split(node)
+	local p = math.random(0, 1)
+	if p == 1 then -- vertical
+		local hNodeA = self:new(node.x, node.y, node.w/2, node.h); hNodeA.super = node
+		local hNodeB = self:new(node.x+node.w/2, node.y, node.w/2, node.h); hNodeB.super = node
+		node.children = {A = hNodeA, B = hNodeB}
+	else -- horizontal
+		local vNodeA = self:new(node.x, node.y, node.w, node.h/2); vNodeA.super = node
+		local vNodeB = self:new(node.x, node.y+node.h/2, node.w, node.h/2); vNodeB.super = node
+		node.children = {A = vNodeA, B = vNodeB}
 	end
-end
-
-function Room:spawnRooms(n)
-	local side = math.random(1,4)
-	local roomB = {w = math.random(2,7)*tileSize, h = math.random(2, 7)*tileSize}
-	local r, g, b = math.random(30,255), math.random(30,255), math.random(30,255)
-	roomB.colors = {r, g, b, 100}
-	local x, y = self:chooseSide(self.base, roomB, side)
-	roomB.x, roomB.y = x, y
-	table.insert(self.rooms, roomB)
-	if #self.rooms <= n then
-		local index = #self.rooms
-		self.base = self.rooms[index]
-		self:spawnRooms(n)
-	end
-end
-
-function Room:draw()
-	love.graphics.setColor(255,255,255)
-	love.graphics.rectangle('fill', self.base.x, self.base.y, self.base.w, self.base.h)
-	for i, v in ipairs(self.rooms) do
-		love.graphics.setColor(unpack(v.colors))
-		love.graphics.rectangle('fill', v.x, v.y, v.w, v.h)
-	end
-end
-
-function Room:reset()
-	self.base = {}
-	self.rooms = {}
-	Room:initializeRootRoom()
-	Room:spawnRooms()
 end
 
 function love.load()
-	Room:initializeRootRoom()
-	Room:spawnRooms(5)
-end
-
-function love.update(dt)
-	print(#Room.rooms)
+	local root = Node:new(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+	Node:split(root)
 end
 
 function love.draw()
-	Room:draw()
-end
-
-function love.keypressed(key)
-	if key == 'r' then
-		Room:reset()
-	end
-	if key == 'escape' then
-		love.event.quit()
+	for i=1, #Node.nodes do
+		local node = Node.nodes[i]
+		if #node.children > 0 then
+			local childA = node.children.A
+			local childB = node.children.B
+			
+		end
 	end
 end
